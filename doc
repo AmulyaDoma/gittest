@@ -1,0 +1,49 @@
+
+1. Change directory to “../work/packages/MYS-6ULX-20180611-m9/04-Source/MYiR-iMX-uboot/”.
+
+2. Copy below contents to boot_scr.txt file. Every line should be in a new line.
+
+setenv mmcroot '/dev/mmcblk0 rootwait rw rootdelay=5 mem=256M'
+setenv mmcargs 'setenv bootargs console=${console},${baudrate} fstype=ext4 \ root=/dev/mmcblk0p2'
+run mmcargs
+fatload mmc 0 0x83000000 zImage
+fatload mmc 0 0x84000000 mys-imx6ul-14x14-evk.dtb
+bootz 0x83000000 - 0x84000000
+
+3. Run “./tools/mkimage -A arm -T script -O linux -d boot_scr.txt boot.scr” to create the boot script boot.scr.
+
+
+----------------
+
+
+Formatting SD Card
+1. Use “sudo umount /dev/sdc1” to unmount partition 1 
+2. Use  “sudo mkfs.vfat /dev/sdc1” to format primary partition .
+3. Use “sudo umount /dev/sdc2” to unmount partition 2.
+4. Use  “sudo mkfs.ext4 /dev/sdc2” to format extended partition.
+Loading Files into SD Card
+U-Boot(Raw Partition)
+Change the directory to “../work/output/uboot”
+Boot loader should be in the raw partition area. To copy the boot loader, run
+ “sudo dd if=u-boot.imx of=/dev/sdc bs=512 seek=2 conv=fsync”
+Linux Kernel(Fat Partition)
+Change the directory to “../work/output/linuxKernel”
+Linux kernel files(zImage,dtb and boot.scr) should be in fat partition area. To copy the linux kernel files, run
+“sudo cp -a * /media/sacrasys/261A-1A2C/”
+“261A-1A2C” is the mount name. This will vary every time when the card gets mounted.
+Root File System(Ext4 Partition)
+Change the directory to “../work/output/rootFilesSystem”
+Root filesystem should be in the ext4 partition area. To copy the root filesystem, run
+“sudo cp -a * /media/sacrasys/b8efc7b6-df69-449f-b21e-edf4c8aab172/”
+
+ “sync” 
+
+Once root filesystem is transferred give permission to read and write the files in sd card ext4 partition.
+Run “sudo chown -Rf root:root /media/sacrasys/b8efc7b6-df69-449f-b21e-edf4c8aab172”
+
+Run  “sudo chmod 766 /media/sacrasys/b8efc7b6-df69-449f-b21e-edf4c8aab172”(if needed). Just be cautious.
+“b8efc7b6-df69-449f-b21e-edf4c8aab172” is the mount name. This will vary every time when the card gets mounted.
+
+Boot Settings
+To boot MYS-6ULX using SD card, boot dip switch should be configured as shown.
+
